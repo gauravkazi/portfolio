@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaurav Thapa — Backend Developer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0F172A;
+    --bg2: #1E293B;
+    --ink: #F8FAFC;
+    --muted: #94A3B8;
+    --line: #27364D;
+    --accent: #22C55E;
+    --accent-soft: rgba(34,197,94,0.12);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a{ color: inherit; }
+
+  .wrap{
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  header{
+    padding: 72px 0 40px;
+  }
+  header .greet{
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  header h1{
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+  header .role{
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 8px;
+  }
+  header .pitch{
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 520px;
+  }
+  .hero-actions{
+    margin-top: 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn{
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+  .btn-primary{
+    background: var(--accent);
+    color: #0F172A;
+  }
+  .btn-secondary{
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .btn-secondary:hover{
+    border-color: var(--accent);
+  }
+  nav{
+    margin-top: 28px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  nav a{
+    font-size: 0.9rem;
+    text-decoration: none;
+    color: var(--muted);
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+  }
+  nav a:hover{
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  section{
+    padding: 44px 0;
+    border-top: 1px solid var(--line);
+  }
+  section h2{
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  /* Profile picture */
+  .avatar{
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--line);
+    margin-bottom: 14px;
+    display: none;
+  }
+  .avatar.loaded{
+    display: block;
+  }
+
+  /* About */
+  #about .about-line{
+    color: var(--ink);
+    max-width: 600px;
+    margin-bottom: 10px;
+  }
+  #about .about-line .label{
+    color: var(--muted);
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 2px;
+  }
+  #about .expertise{
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+  #about .expertise b{
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Skills */
+  .skill-group{
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px 20px;
+    padding: 10px 0;
+  }
+  .skill-group + .skill-group{
+    border-top: 1px solid var(--line);
+  }
+  .skill-label{
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .skill-tags{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .skill-tags span{
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+
+  /* Projects */
+  .project{
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px 22px;
+  }
+  .project + .project{
+    margin-top: 16px;
+  }
+  .project h3{
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .project .stack{
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+  .project p{
+    margin-top: 10px;
+    color: var(--muted);
+    max-width: 580px;
+  }
+  .project ul{
+    margin-top: 10px;
+    padding-left: 18px;
+    color: var(--ink);
+  }
+  .project ul li{
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+  }
+  .project .links{
+    margin-top: 14px;
+    display: flex;
+    gap: 16px;
+  }
+  .project .links a{
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Experience */
+  .job{
+    padding: 18px 0;
+  }
+  .job + .job{
+    border-top: 1px solid var(--line);
+  }
+  .job-head{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .job-head .title{
+    font-weight: 600;
+  }
+  .job-head .meta{
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .job ul{
+    margin-top: 10px;
+    padding-left: 18px;
+  }
+  .job ul li{
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  /* Education */
+  .edu-head{
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .edu-head .title{ font-weight: 600; }
+  .edu-head .meta{
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  #education p{
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  /* Contact */
+  .contact-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .contact-list a{
+    text-decoration: none;
+    font-size: 0.98rem;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .contact-list a .k{
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    width: 70px;
+  }
+  .contact-list a:hover .v{
+    border-bottom-color: var(--accent);
+  }
+  .contact-list a .v{
+    border-bottom: 1px solid var(--line);
+  }
+  .resume-note{
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  footer{
+    padding: 32px 0 60px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 560px){
+    header{ padding-top: 48px; }
+    header h1{ font-size: 1.7rem; }
+    .skill-group{ grid-template-columns: 1fr; gap: 4px; }
+    .job-head, .edu-head{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <img id="profile-avatar" class="avatar" src="" alt="Profile picture">
+    <div class="greet">Hi, I'm</div>
+    <h1 id="profile-name">Gaurav Thapa</h1>
+    <div class="role" id="profile-role">Node.js Backend Developer</div>
+    <p class="pitch" id="profile-pitch">I build secure REST APIs and scalable backend applications using Node.js, Express.js, MongoDB, and JWT authentication.</p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-primary">View Projects</a>
+      <a href="https://github.com/gauravkazi" target="_blank" rel="noopener" class="btn btn-secondary">GitHub</a>
+      <a href="resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">View CV</a>
+      <a href="resume.pdf" download="Gaurav_Thapa_Resume.pdf" class="btn btn-secondary">Download CV</a>
+    </div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="about">
+    <h2>About</h2>
+    <p class="about-line">
+      <span class="label">Backend Developer &amp; BCA Student</span>
+      9 months of internship experience at Juji Consultant, specializing in backend and MERN stack development.
+    </p>
+    <p class="expertise"><b>Core expertise:</b> Node.js, Express.js, MongoDB, REST APIs, JWT Authentication, API Integration.</p>
+  </section>
+
+  <section id="skills">
+    <h2>Skills</h2>
+
+    <div class="skill-group">
+      <div class="skill-label">Backend</div>
+      <div class="skill-tags"><span>Node.js</span><span>Express.js</span><span>REST API</span><span>JSON</span><span>Fetch API</span><span>Stripe API</span></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-label">Database</div>
+      <div class="skill-tags"><span>MongoDB</span><span>SQL</span></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-label">Languages</div>
+      <div class="skill-tags"><span>JavaScript</span><span>Python</span></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-label">Tools</div>
+      <div class="skill-tags"><span>Git</span><span>GitHub</span><span>Browser DevTools</span><span>PyCharm Debugger</span></div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-label">Frontend</div>
+      <div class="skill-tags"><span>HTML</span><span>CSS</span><span>React.js</span></div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+    <div id="projects-container">
+      <!-- Projects are injected here from the API. Static fallback below shows if the API is unreachable. -->
+      <div class="project">
+        <h3>HireLocal — Multi-Vendor Service Marketplace</h3>
+        <div class="stack">Node.js · Express.js · MongoDB · React.js · JWT · Cloudinary</div>
+        <p>A full-stack marketplace platform connecting customers with local freelancers — web developers, designers, writers, and marketers. Built end-to-end: REST API, database design, React frontend, and live deployment.</p>
+        <ul>
+          <li>Role-based auth (customer/provider/admin) with JWT and bcrypt password hashing</li>
+          <li>Service request workflow with status tracking (Pending → Accepted → In Progress → Completed → Delivered)</li>
+          <li>Review and rating system with automatic average-rating recalculation on each new review</li>
+          <li>Image upload via Cloudinary, role-specific dashboards, and email notifications via a transactional email API</li>
+        </ul>
+        <div class="links">
+          <a href="https://github.com/gauravkazi/HireLocal" target="_blank" rel="noopener">GitHub →</a>
+          <a href="https://hire-local.vercel.app" target="_blank" rel="noopener">Live Demo →</a>
+        </div>
+      </div>
+
+      <div class="project">
+        <h3>E-commerce Backend</h3>
+        <div class="stack">Node.js · Express.js · MongoDB · Stripe API</div>
+        <p>A complete REST API backend for an online store — handling everything from user accounts to checkout. It covers product catalog, shopping cart, and role-based access so customers and admins get different permissions, with real payment processing through Stripe.</p>
+        <ul>
+          <li>Built REST API with JWT authentication and role-based access control (customer/admin)</li>
+          <li>Integrated Stripe for payments, including PaymentIntent creation and webhook handling</li>
+          <li>Designed cart-to-order conversion logic with automatic pricing (subtotal, tax, shipping)</li>
+        </ul>
+        <div class="links">
+          <a href="https://github.com/gauravkazi/ecommerce-backend" target="_blank" rel="noopener">GitHub →</a>
+        </div>
+      </div>
+
+      <div class="project">
+        <h3>JWT Authentication API</h3>
+        <div class="stack">Node.js · Express.js · MongoDB</div>
+        <p>A standalone authentication service that other backend projects can plug into. It handles secure signup and login, and issues access and refresh tokens so sessions stay both secure and convenient.</p>
+        <ul>
+          <li>Secure registration and login with JWT access and refresh tokens</li>
+          <li>Password hashing, protected route middleware, and role-based authorization</li>
+          <li>Reusable auth middleware built to work across multiple backend services</li>
+        </ul>
+        <div class="links">
+          <a href="https://github.com/gauravkazi/JWT-Authentication-API" target="_blank" rel="noopener">GitHub →</a>
+        </div>
+      </div>
+
+      <div class="project">
+        <h3>Student Management System</h3>
+        <div class="stack">MERN Stack · MongoDB</div>
+        <p>A full CRUD platform for schools to manage student records, attendance, and grades from one dashboard, with different access levels for staff and admins.</p>
+        <ul>
+          <li>RESTful APIs for managing student records, attendance, and grades</li>
+          <li>Role-based access control for different user types</li>
+          <li>JWT-based authentication paired with a responsive React dashboard</li>
+        </ul>
+        <div class="links">
+          <a href="https://github.com/gauravkazi" target="_blank" rel="noopener">GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience">
+    <h2>Experience</h2>
+    <div class="job">
+      <div class="job-head">
+        <div class="title">Junior Developer Intern — Juji Consultant</div>
+        <div class="meta">June 2024 – February 2025 · Kathmandu, Nepal</div>
+      </div>
+      <ul>
+        <li>Developed and integrated RESTful APIs consumed by frontend clients</li>
+        <li>Participated in client meetings to understand design requirements and present prototypes</li>
+        <li>Collaborated with senior developers to debug and optimize existing codebases</li>
+        <li>Gained practical experience using Git for version control in a team-based environment</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="education">
+    <h2>Education</h2>
+    <div class="edu-head">
+      <div class="title">Bachelor of Computer Applications (BCA)</div>
+      <div class="meta">2023 – Present</div>
+    </div>
+    <p>AIMS International College · Tribhuvan University · 4th Semester</p>
+    <p>Relevant coursework: Data Structures, Web Technologies, Database Management, and OOP</p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <div class="contact-list">
+      <a href="mailto:gauravkazi7@gmail.com"><span class="k">Email</span><span class="v">gauravkazi7@gmail.com</span></a>
+      <a href="https://www.linkedin.com/in/gaurav-thapa-5354b4395/" target="_blank" rel="noopener"><span class="k">LinkedIn</span><span class="v">linkedin.com/in/gaurav-thapa</span></a>
+      <a href="https://github.com/gauravkazi" target="_blank" rel="noopener"><span class="k">GitHub</span><span class="v">github.com/gauravkazi</span></a>
+      <a href="resume.pdf" download="Gaurav_Thapa_Resume.pdf"><span class="k">Resume</span><span class="v">Download CV (PDF)</span></a>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Gaurav Thapa
+  </footer>
+
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5002/api';
+
+  async function loadProfile() {
+    try {
+      const res = await fetch(`${API_BASE}/profile`);
+      const data = await res.json();
+
+      if (data.name) document.getElementById('profile-name').textContent = data.name;
+      if (data.role) document.getElementById('profile-role').textContent = data.role;
+      if (data.pitch) document.getElementById('profile-pitch').textContent = data.pitch;
+      if (data.profilePicture) {
+        const avatar = document.getElementById('profile-avatar');
+        avatar.src = data.profilePicture;
+        avatar.classList.add('loaded');
+      }
+    } catch (err) {
+      console.error('Failed to load profile, showing static defaults:', err);
+    }
+  }
+
+  async function loadProjects() {
+    try {
+      const res = await fetch(`${API_BASE}/projects`);
+      const projects = await res.json();
+
+      if (!projects.length) return; // keep static fallback if nothing in the DB yet
+
+      const container = document.getElementById('projects-container');
+      container.innerHTML = '';
+
+      projects.forEach((project) => {
+        const div = document.createElement('div');
+        div.className = 'project';
+
+        const bulletsHtml = (project.bullets || [])
+          .map((b) => `<li>${b}</li>`)
+          .join('');
+
+        const linksHtml = [
+          project.githubLink ? `<a href="${project.githubLink}" target="_blank" rel="noopener">GitHub →</a>` : '',
+          project.liveLink ? `<a href="${project.liveLink}" target="_blank" rel="noopener">Live Demo →</a>` : '',
+        ].join('');
+
+        div.innerHTML = `
+          <h3>${project.title}</h3>
+          <div class="stack">${project.stack}</div>
+          <p>${project.description}</p>
+          <ul>${bulletsHtml}</ul>
+          <div class="links">${linksHtml}</div>
+        `;
+
+        container.appendChild(div);
+      });
+    } catch (err) {
+      console.error('Failed to load projects, showing static fallback:', err);
+    }
+  }
+
+  loadProfile();
+  loadProjects();
+</script>
+
+</body>
+</html>

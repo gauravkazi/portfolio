@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Portfolio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0F172A;
+    --bg2: #1E293B;
+    --ink: #F8FAFC;
+    --muted: #94A3B8;
+    --line: #27364D;
+    --accent: #22C55E;
+    --danger: #EF4444;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.6;
+  }
+
+  .wrap{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  h1{ font-size: 1.5rem; font-weight: 700; margin-bottom: 24px; }
+  h2{ font-size: 1.05rem; font-weight: 600; margin-bottom: 14px; }
+
+  section{
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+
+  label{
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    margin-top: 12px;
+  }
+  label:first-of-type{ margin-top: 0; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="url"],
+  textarea{
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+  }
+  textarea{ resize: vertical; min-height: 70px; }
+
+  input[type="file"]{
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  button{
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-top: 14px;
+  }
+  .btn-primary{ background: var(--accent); color: #0F172A; }
+  .btn-danger{ background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+  .btn-secondary{ background: transparent; color: var(--ink); border: 1px solid var(--line); }
+
+  .msg{ font-size: 0.85rem; margin-top: 10px; }
+  .msg.ok{ color: var(--accent); }
+  .msg.err{ color: var(--danger); }
+
+  #login-screen{
+    max-width: 340px;
+    margin: 120px auto 0;
+  }
+
+  #dashboard{ display: none; }
+
+  .project-item{
+    border-top: 1px solid var(--line);
+    padding: 14px 0;
+  }
+  .project-item:first-child{ border-top: none; padding-top: 0; }
+  .project-item .p-title{ font-weight: 600; }
+  .project-item .p-stack{ font-family: var(--mono); font-size: 0.75rem; color: var(--accent); margin-top: 2px; }
+  .project-item .p-actions{ margin-top: 8px; display: flex; gap: 10px; }
+  .project-item .p-actions button{ margin-top: 0; padding: 5px 12px; font-size: 0.78rem; }
+
+  .top-bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .top-bar a{
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+
+  .avatar-preview{
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--line);
+    display: none;
+    margin-bottom: 10px;
+  }
+  .avatar-preview.loaded{ display: block; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- LOGIN SCREEN -->
+  <div id="login-screen">
+    <h1>Admin Login</h1>
+    <section>
+      <label>Email</label>
+      <input type="email" id="login-email">
+      <label>Password</label>
+      <input type="password" id="login-password">
+      <button class="btn-primary" onclick="login()">Log in</button>
+      <div id="login-msg" class="msg"></div>
+    </section>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="top-bar">
+      <h1 style="margin:0;">Portfolio Admin</h1>
+      <div>
+        <a href="index.html" target="_blank">View site →</a>
+        &nbsp;&nbsp;
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <section>
+      <h2>Profile</h2>
+      <img id="avatar-preview" class="avatar-preview" src="" alt="">
+      <label>Name</label>
+      <input type="text" id="p-name">
+      <label>Role / Title</label>
+      <input type="text" id="p-role">
+      <label>Pitch</label>
+      <textarea id="p-pitch"></textarea>
+      <label>Profile Picture</label>
+      <input type="file" id="p-picture" accept="image/*">
+      <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
+      <div id="profile-msg" class="msg"></div>
+    </section>
+
+    <!-- ADD PROJECT -->
+    <section>
+      <h2>Add a Project</h2>
+      <label>Title</label>
+      <input type="text" id="new-title">
+      <label>Stack (e.g. Node.js · Express · MongoDB)</label>
+      <input type="text" id="new-stack">
+      <label>Description</label>
+      <textarea id="new-description"></textarea>
+      <label>Bullet points (one per line)</label>
+      <textarea id="new-bullets"></textarea>
+      <label>GitHub Link</label>
+      <input type="url" id="new-github">
+      <label>Live Demo Link</label>
+      <input type="url" id="new-live">
+      <label>Order (lower shows first)</label>
+      <input type="number" id="new-order" value="0">
+      <button class="btn-primary" onclick="addProject()">Add Project</button>
+      <div id="add-project-msg" class="msg"></div>
+    </section>
+
+    <!-- EXISTING PROJECTS -->
+    <section>
+      <h2>Existing Projects</h2>
+      <div id="projects-list">Loading...</div>
+    </section>
+  </div>
+
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:5002/api';
+  let token = localStorage.getItem('adminToken');
+
+  function showMsg(elId, text, ok) {
+    const el = document.getElementById(elId);
+    el.textContent = text;
+    el.className = 'msg ' + (ok ? 'ok' : 'err');
+  }
+
+  // ---- AUTH ----
+  async function login() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login failed');
+
+      token = data.token;
+      localStorage.setItem('adminToken', token);
+      enterDashboard();
+    } catch (err) {
+      showMsg('login-msg', err.message, false);
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('adminToken');
+    token = null;
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'block';
+  }
+
+  function enterDashboard() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadProfileForm();
+    loadProjectsList();
+  }
+
+  // ---- PROFILE ----
+  async function loadProfileForm() {
+    const res = await fetch(`${API_BASE}/profile`);
+    const data = await res.json();
+    document.getElementById('p-name').value = data.name || '';
+    document.getElementById('p-role').value = data.role || '';
+    document.getElementById('p-pitch').value = data.pitch || '';
+    if (data.profilePicture) {
+      const img = document.getElementById('avatar-preview');
+      img.src = data.profilePicture;
+      img.classList.add('loaded');
+    }
+  }
+
+  async function saveProfile() {
+    const formData = new FormData();
+    formData.append('name', document.getElementById('p-name').value);
+    formData.append('role', document.getElementById('p-role').value);
+    formData.append('pitch', document.getElementById('p-pitch').value);
+    const fileInput = document.getElementById('p-picture');
+    if (fileInput.files[0]) {
+      formData.append('profilePicture', fileInput.files[0]);
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/profile`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to save');
+
+      showMsg('profile-msg', 'Profile saved successfully!', true);
+      loadProfileForm();
+    } catch (err) {
+      showMsg('profile-msg', err.message, false);
+    }
+  }
+
+  // ---- PROJECTS ----
+  async function loadProjectsList() {
+    const res = await fetch(`${API_BASE}/projects`);
+    const projects = await res.json();
+    const container = document.getElementById('projects-list');
+
+    if (!projects.length) {
+      container.innerHTML = '<p style="color:var(--muted); font-size:0.9rem;">No projects yet.</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    projects.forEach((p) => {
+      const div = document.createElement('div');
+      div.className = 'project-item';
+      div.innerHTML = `
+        <div class="p-title">${p.title}</div>
+        <div class="p-stack">${p.stack}</div>
+        <div class="p-actions">
+          <button class="btn-danger" onclick="deleteProject('${p._id}')">Delete</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  async function addProject() {
+    const bullets = document.getElementById('new-bullets').value
+      .split('\n')
+      .map((b) => b.trim())
+      .filter(Boolean);
+
+    const body = {
+      title: document.getElementById('new-title').value,
+      stack: document.getElementById('new-stack').value,
+      description: document.getElementById('new-description').value,
+      bullets,
+      githubLink: document.getElementById('new-github').value,
+      liveLink: document.getElementById('new-live').value,
+      order: Number(document.getElementById('new-order').value) || 0,
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/projects`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to add project');
+
+      showMsg('add-project-msg', 'Project added!', true);
+      document.getElementById('new-title').value = '';
+      document.getElementById('new-stack').value = '';
+      document.getElementById('new-description').value = '';
+      document.getElementById('new-bullets').value = '';
+      document.getElementById('new-github').value = '';
+      document.getElementById('new-live').value = '';
+      document.getElementById('new-order').value = '0';
+
+      loadProjectsList();
+    } catch (err) {
+      showMsg('add-project-msg', err.message, false);
+    }
+  }
+
+  async function deleteProject(id) {
+    if (!confirm('Delete this project?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/projects/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to delete');
+      loadProjectsList();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  // ---- INIT ----
+  if (token) {
+    enterDashboard();
+  }
+</script>
+
+</body>
+</html>
