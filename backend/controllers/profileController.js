@@ -27,7 +27,11 @@ const updateProfile = async (req, res) => {
     profile.pitch = pitch ?? profile.pitch;
 
     if (req.file) {
-      profile.profilePicture = req.file.path;
+      if (req.file.fieldname === 'resume') {
+        profile.resumeUrl = req.file.path;
+      } else {
+        profile.profilePicture = req.file.path;
+      }
     }
 
     const updatedProfile = await profile.save();

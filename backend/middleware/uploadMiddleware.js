@@ -13,4 +13,15 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
-module.exports = upload;
+const resumeStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'portfolio_resume',
+    resource_type: 'raw',
+    allowed_formats: ['pdf'],
+  },
+});
+
+const uploadResume = multer({ storage: resumeStorage});
+
+module.exports = { upload, uploadResume };

@@ -101,6 +101,19 @@
   .msg.ok{ color: var(--accent); }
   .msg.err{ color: var(--danger); }
 
+  hr.divider{
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 18px 0;
+  }
+
+  .current-file{
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .current-file a{ color: var(--accent); text-decoration: none; }
+
   #login-screen{
     max-width: 340px;
     margin: 120px auto 0;
@@ -184,6 +197,14 @@
       <input type="file" id="p-picture" accept="image/*">
       <button class="btn-primary" onclick="saveProfile()">Save Profile</button>
       <div id="profile-msg" class="msg"></div>
+
+      <hr class="divider">
+
+      <label>Resume (PDF)</label>
+      <input type="file" id="p-resume" accept="application/pdf">
+      <div id="current-resume" class="current-file"></div>
+      <button class="btn-secondary" onclick="saveResume()">Upload Resume</button>
+      <div id="resume-msg" class="msg"></div>
     </section>
 
     <!-- ADD / EDIT PROJECT -->
@@ -286,6 +307,12 @@
       img.src = data.profilePicture;
       img.classList.add('loaded');
     }
+    const resumeNote = document.getElementById('current-resume');
+    if (data.resumeUrl) {
+      resumeNote.innerHTML = `Current: <a href="${data.resumeUrl}" target="_blank" rel="noopener">view uploaded resume →</a>`;
+    } else {
+      resumeNote.textContent = 'No resume uploaded yet.';
+    }
   }
 
   async function saveProfile() {
@@ -311,6 +338,33 @@
       loadProfileForm();
     } catch (err) {
       showMsg('profile-msg', err.message, false);
+    }
+  }
+
+  async function saveResume() {
+    const fileInput = document.getElementById('p-resume');
+    if (!fileInput.files[0]) {
+      showMsg('resume-msg', 'Choose a PDF first', false);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('resume', fileInput.files[0]);
+
+    try {
+      const res = await fetch(`${API_BASE}/profile/resume`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to upload');
+
+      showMsg('resume-msg', 'Resume uploaded!', true);
+      fileInput.value = '';
+      loadProfileForm();
+    } catch (err) {
+      showMsg('resume-msg', err.message, false);
     }
   }
 

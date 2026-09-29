@@ -338,8 +338,8 @@
     <div class="hero-actions">
       <a href="#projects" class="btn btn-primary">View Projects</a>
       <a href="https://github.com/gauravkazi" target="_blank" rel="noopener" class="btn btn-secondary">GitHub</a>
-      <a href="resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary">View CV</a>
-      <a href="resume.pdf" download="Gaurav_Thapa_Resume.pdf" class="btn btn-secondary">Download CV</a>
+      <a href="resume.pdf" target="_blank" rel="noopener" class="btn btn-secondary" id="cv-view">View CV</a>
+      <a href="resume.pdf" download="Gaurav_Thapa_Resume.pdf" class="btn btn-secondary" id="cv-download">Download CV</a>
     </div>
     <nav>
       <a href="#about">About</a>
@@ -506,6 +506,10 @@
         const avatar = document.getElementById('profile-avatar');
         avatar.src = data.profilePicture;
         avatar.classList.add('loaded');
+      }
+      if(data.resumeUrl){
+        document.getElementById('cv-view').href = data.resumeUrl;
+        document.getElementById('cv-download').href = data.resumeUrl;
       }
     } catch (err) {
       console.error('Failed to load profile, showing static defaults:', err);

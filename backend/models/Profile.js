@@ -17,6 +17,10 @@ const profileSchema = new mongoose.Schema(
             type:String,
             default:'',
         },
+        resumeUrl:{
+            type:String,
+            default:'',
+        },
     },
     {timestamps:true}
 );
