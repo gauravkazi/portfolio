@@ -45,6 +45,10 @@
     margin-bottom: 20px;
   }
 
+  section.editing{
+    border-color: var(--accent);
+  }
+
   label{
     display: block;
     font-size: 0.8rem;
@@ -90,6 +94,8 @@
   .btn-primary{ background: var(--accent); color: #0F172A; }
   .btn-danger{ background: transparent; color: var(--danger); border: 1px solid var(--danger); }
   .btn-secondary{ background: transparent; color: var(--ink); border: 1px solid var(--line); }
+
+  .form-actions{ display: flex; gap: 10px; }
 
   .msg{ font-size: 0.85rem; margin-top: 10px; }
   .msg.ok{ color: var(--accent); }
@@ -180,9 +186,9 @@
       <div id="profile-msg" class="msg"></div>
     </section>
 
-    <!-- ADD PROJECT -->
-    <section>
-      <h2>Add a Project</h2>
+    <!-- ADD / EDIT PROJECT -->
+    <section id="project-form-section">
+      <h2 id="project-form-title">Add a Project</h2>
       <label>Title</label>
       <input type="text" id="new-title">
       <label>Stack (e.g. Node.js · Express · MongoDB)</label>
@@ -197,7 +203,10 @@
       <input type="url" id="new-live">
       <label>Order (lower shows first)</label>
       <input type="number" id="new-order" value="0">
-      <button class="btn-primary" onclick="addProject()">Add Project</button>
+      <div class="form-actions">
+        <button class="btn-primary" id="project-submit-btn" onclick="submitProject()">Add Project</button>
+        <button class="btn-secondary" id="project-cancel-btn" onclick="cancelEdit()" style="display:none;">Cancel</button>
+      </div>
       <div id="add-project-msg" class="msg"></div>
     </section>
 
@@ -211,8 +220,18 @@
 </div>
 
 <script>
-  const API_BASE = '/api';
+  const API_BASE = 'https://portfolio-7wus.onrender.com';
   let token = localStorage.getItem('adminToken');
+  let projectsCache = [];
+  let editingId = null;
+
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
 
   function showMsg(elId, text, ok) {
     const el = document.getElementById(elId);
@@ -298,22 +317,23 @@
   // ---- PROJECTS ----
   async function loadProjectsList() {
     const res = await fetch(`${API_BASE}/projects`);
-    const projects = await res.json();
+    projectsCache = await res.json();
     const container = document.getElementById('projects-list');
 
-    if (!projects.length) {
+    if (!projectsCache.length) {
       container.innerHTML = '<p style="color:var(--muted); font-size:0.9rem;">No projects yet.</p>';
       return;
     }
 
     container.innerHTML = '';
-    projects.forEach((p) => {
+    projectsCache.forEach((p) => {
       const div = document.createElement('div');
       div.className = 'project-item';
       div.innerHTML = `
-        <div class="p-title">${p.title}</div>
-        <div class="p-stack">${p.stack}</div>
+        <div class="p-title">${esc(p.title)}</div>
+        <div class="p-stack">${esc(p.stack)}</div>
         <div class="p-actions">
+          <button class="btn-secondary" onclick="startEdit('${p._id}')">Edit</button>
           <button class="btn-danger" onclick="deleteProject('${p._id}')">Delete</button>
         </div>
       `;
@@ -321,7 +341,48 @@
     });
   }
 
-  async function addProject() {
+  function clearProjectForm() {
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-stack').value = '';
+    document.getElementById('new-description').value = '';
+    document.getElementById('new-bullets').value = '';
+    document.getElementById('new-github').value = '';
+    document.getElementById('new-live').value = '';
+    document.getElementById('new-order').value = '0';
+  }
+
+  function startEdit(id) {
+    const p = projectsCache.find((x) => x._id === id);
+    if (!p) return;
+
+    editingId = id;
+    document.getElementById('new-title').value = p.title || '';
+    document.getElementById('new-stack').value = p.stack || '';
+    document.getElementById('new-description').value = p.description || '';
+    document.getElementById('new-bullets').value = (p.bullets || []).join('\n');
+    document.getElementById('new-github').value = p.githubLink || '';
+    document.getElementById('new-live').value = p.liveLink || '';
+    document.getElementById('new-order').value = p.order ?? 0;
+
+    document.getElementById('project-form-title').textContent = 'Edit Project';
+    document.getElementById('project-submit-btn').textContent = 'Save Changes';
+    document.getElementById('project-cancel-btn').style.display = 'inline-block';
+    document.getElementById('project-form-section').classList.add('editing');
+    showMsg('add-project-msg', '', true);
+
+    document.getElementById('project-form-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    editingId = null;
+    clearProjectForm();
+    document.getElementById('project-form-title').textContent = 'Add a Project';
+    document.getElementById('project-submit-btn').textContent = 'Add Project';
+    document.getElementById('project-cancel-btn').style.display = 'none';
+    document.getElementById('project-form-section').classList.remove('editing');
+  }
+
+  async function submitProject() {
     const bullets = document.getElementById('new-bullets').value
       .split('\n')
       .map((b) => b.trim())
@@ -337,9 +398,12 @@
       order: Number(document.getElementById('new-order').value) || 0,
     };
 
+    const isEdit = Boolean(editingId);
+    const url = isEdit ? `${API_BASE}/projects/${editingId}` : `${API_BASE}/projects`;
+
     try {
-      const res = await fetch(`${API_BASE}/projects`, {
-        method: 'POST',
+      const res = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -347,17 +411,10 @@
         body: JSON.stringify(body),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to add project');
+      if (!res.ok) throw new Error(data.message || 'Failed to save project');
 
-      showMsg('add-project-msg', 'Project added!', true);
-      document.getElementById('new-title').value = '';
-      document.getElementById('new-stack').value = '';
-      document.getElementById('new-description').value = '';
-      document.getElementById('new-bullets').value = '';
-      document.getElementById('new-github').value = '';
-      document.getElementById('new-live').value = '';
-      document.getElementById('new-order').value = '0';
-
+      cancelEdit();
+      showMsg('add-project-msg', isEdit ? 'Project updated!' : 'Project added!', true);
       loadProjectsList();
     } catch (err) {
       showMsg('add-project-msg', err.message, false);
@@ -372,6 +429,7 @@
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to delete');
+      if (editingId === id) cancelEdit();
       loadProjectsList();
     } catch (err) {
       alert(err.message);
