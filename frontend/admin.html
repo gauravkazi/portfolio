@@ -309,7 +309,8 @@
     }
     const resumeNote = document.getElementById('current-resume');
     if (data.resumeUrl) {
-      resumeNote.innerHTML = `Current: <a href="${data.resumeUrl}" target="_blank" rel="noopener">view uploaded resume →</a>`;
+      const viewUrl = data.resumeUrl.replace('/upload/', '/upload/fl_attachment:false/');
+      resumeNote.innerHTML = `Current: <a href="${viewUrl}" target="_blank" rel="noopener">view uploaded resume →</a>`;
     } else {
       resumeNote.textContent = 'No resume uploaded yet.';
     }
