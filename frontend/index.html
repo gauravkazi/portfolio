@@ -507,14 +507,18 @@
         avatar.src = data.profilePicture;
         avatar.classList.add('loaded');
       }
-      if(data.resumeUrl){
+      if (data.resumeUrl) {
+       // View CV → open normally in browser
         document.getElementById('cv-view').href = data.resumeUrl;
-        const downloadUrl = data.resumeUrl.replace(
-          '/upload/',
-          '/upload/fl_attachment/'
+
+       // Download CV → force Cloudinary to download
+       const downloadUrl = data.resumeUrl.replace(
+        '/image/upload/',
+        '/image/upload/fl_attachment/'
         );
-        document.getElementById('cv-download').href = data.resumeUrl;
-      }
+
+  document.getElementById('cv-download').href = downloadUrl;
+}
     } catch (err) {
       console.error('Failed to load profile, showing static defaults:', err);
     }
