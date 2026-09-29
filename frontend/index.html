@@ -508,8 +508,7 @@
         avatar.classList.add('loaded');
       }
       if(data.resumeUrl){
-        const viewUrl = data.resumeUrl.replace('/upload/', '/upload/fl_attachment:false/');
-        document.getElementById('cv-view').href = viewUrl;
+        document.getElementById('cv-view').href = data.resumeUrl;
         document.getElementById('cv-download').href = data.resumeUrl;
       }
     } catch (err) {
